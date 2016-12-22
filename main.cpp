@@ -17,7 +17,7 @@ int main()
 	std::cout << l1 << l2 << l3 << l4 << l5 << l6 << *l7;
 
 	delete l7;
-
+	l1 = l1 + l2 - l3 * l4 / l5;
 	l1 = l2;
 	std::cout << l1;
 
