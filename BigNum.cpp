@@ -222,33 +222,27 @@ char BigNum::operator[](const int position) {
 	return '0';
 }
 
-void BigNum::equals_operation(const BigNum& result) {
-	strcpy(value, result.value);
-	size = result.size;
-	sign = result.sign;
-}
-
 BigNum BigNum::operator/=(const BigNum & big_num){
 	BigNum result = *this / big_num;
-	equals_operation(result);
+	*this = result;
 	return *this;
 }
 
 BigNum BigNum::operator*= (const BigNum& big_num) {
 	BigNum result = *this * big_num;
-	equals_operation(result);
+	*this = result;
 	return *this;
 }
 
 BigNum BigNum::operator+= (const BigNum& big_num) {
 	BigNum result = *this + big_num;
-	equals_operation(result);
+	*this = result;
 	return *this;
 }
 
 BigNum BigNum::operator-= (const BigNum& big_num) {
 	BigNum result = *this - big_num;
-	equals_operation(result);
+	*this = result;
 	return *this;
 }
 
