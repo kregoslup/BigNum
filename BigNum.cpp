@@ -1,5 +1,3 @@
-#define _DEBUG 
-#define _CRTDBG_MAP_ALLOC
 #include "BigNum.h"
 #include <iostream>
 #include <cstring>
@@ -78,6 +76,7 @@ BigNum BigNum::operator = (int num) {
 	if (*this != *big_num) {
 		return *big_num;
 	}
+	delete big_num;
 	return *this;
 }
 
@@ -97,17 +96,15 @@ BigNum BigNum::operator+ (const BigNum& big_num) {
 }
 
 BigNum BigNum::addition(const BigNum& big_num) {
-	BigNum *longer = ((*this).size > big_num.size) ? new BigNum(*this) : new BigNum(big_num);
-	BigNum *shorter = (*this == *longer) ? new BigNum(big_num) : new BigNum(*this);
-	// po co normalizowac
-	if (longer->size > shorter->size) {
-		shorter->normalize_value_length(longer->size);
+	BigNum longer = ((*this).size > big_num.size) ? *this : big_num;
+	BigNum shorter = (*this == longer) ? big_num : *this;
+	if (longer.size > shorter.size) {
+		shorter.normalize_value_length(longer.size);
 	}
-	longer->add_with_carry(*shorter);
-	longer->size = strlen(longer->value);
-	longer->sign = POSITIVE;
-	delete shorter;
-	return *longer;
+	longer.add_with_carry(shorter);
+	longer.size = strlen(longer.value);
+	longer.sign = POSITIVE;
+	return longer;
 }
 
 void BigNum::normalize_value_length(int new_size) {
@@ -175,37 +172,35 @@ BigNum BigNum::operator-(void){
 }
 
 BigNum BigNum::operator* (const BigNum& big_num) {
-	BigNum *longer = ((*this).size > big_num.size) ? new BigNum(*this) : new BigNum(big_num);
-	BigNum *shorter = (*this == *longer) ? new BigNum(big_num) : new BigNum(*this);
-	BigNum *result = new BigNum();
-	result->initialize_value(longer->size);
-	result->carry_multiplication(*longer, *shorter);
-	result->size = strlen(result->value);
-	result->set_sign(longer->sign*shorter->sign);
-	delete longer;
-	delete shorter;
-	return *result;
+	BigNum longer = ((*this).size > big_num.size) ? *this : big_num;
+	BigNum shorter = (*this == longer) ? big_num : *this;
+	BigNum result;
+	result.initialize_value(longer.size);
+	result.carry_multiplication(longer, shorter);
+	result.size = strlen(result.value);
+	result.set_sign(longer.sign*shorter.sign);
+	return result;
 }
 
 BigNum BigNum::operator/(const BigNum & big_num){
-	// tu wystraczy zrobic count = 0
-	if (big_num < *this) {
-		return BigNum();
-	}
+	//// tu wystraczy zrobic count = 0
+	//if (big_num < *this) {
+	//	return BigNum();
+	//}
 	BigNum temp(*this);
-	BigNum count = 0;
+	BigNum *count = new BigNum();
 	while (big_num > temp) {
-		count += 1;
+		*count += 1;
 		temp += temp;
 	}
+	return *count;
 	//return count
-	return BigNum(count);
 }
 
 std::ostream& operator<<(std::ostream& str, const BigNum& big_num){
 	if (strlen(big_num.value) > 0 && big_num.size > 0) {
 		if (big_num.is_negative()) {
-			str << "-";
+			str << BigNum::MINUS_CHAR;
 		}
 		for (int i = 0; i < big_num.size; i++) {
 			str << big_num.value[i];
@@ -222,33 +217,27 @@ char BigNum::operator[](const int position) {
 	return '0';
 }
 
-void BigNum::equals_operation(const BigNum& result) {
-	strcpy(value, result.value);
-	size = result.size;
-	sign = result.sign;
-}
-
 BigNum BigNum::operator/=(const BigNum & big_num){
 	BigNum result = *this / big_num;
-	equals_operation(result);
+	*this = result;
 	return *this;
 }
 
 BigNum BigNum::operator*= (const BigNum& big_num) {
 	BigNum result = *this * big_num;
-	equals_operation(result);
+	*this = result;
 	return *this;
 }
 
 BigNum BigNum::operator+= (const BigNum& big_num) {
 	BigNum result = *this + big_num;
-	equals_operation(result);
+	*this = result;
 	return *this;
 }
 
 BigNum BigNum::operator-= (const BigNum& big_num) {
 	BigNum result = *this - big_num;
-	equals_operation(result);
+	*this = result;
 	return *this;
 }
 
@@ -326,7 +315,7 @@ void BigNum::set_sign(int num) {
 }
 
 void BigNum::set_sign(char *num) {
-	if (num[0] == '-') {
+	if (num[0] == MINUS_CHAR) {
 		sign = NEGATIVE;
 	}
 	else {
@@ -364,12 +353,11 @@ void BigNum::num_to_char_array(int num){
 }
 
 void BigNum::copy_array_wihout_sign(char* arr, int size) {
+	value = new char[size + 1];
 	if (sign == NEGATIVE) {
-		value = new char[size + 1];
 		strcpy(value, arr + SIGN_SIZE);
 	}
 	else {
-		value = new char[size + 1];
 		strcpy(value, arr);
 	}
 }
@@ -401,7 +389,8 @@ void BigNum::add_with_carry(const BigNum& shorter) {
 	addition_size = size;
 }
 
-int my_atoi(char c) { return c - '0'; };
+int BigNum::my_atoi(char c) { return c - CHAR_TO_INT; };
+int BigNum::my_itoa(int c) { return c + CHAR_TO_INT; };
 
 void BigNum::carry_multiplication(const BigNum& longer, const BigNum& shorter) {
 	int carry = 0;
@@ -410,24 +399,22 @@ void BigNum::carry_multiplication(const BigNum& longer, const BigNum& shorter) {
 		if (row > 0) {
 			extend_value();
 		}
-		std::cout << i << std::endl;
-		std::cout << i << std::endl;
 		for (int y = longer.size - 1; y >= 0; y--) {
 			int sum = my_atoi(longer.value[y]) * my_atoi(shorter.value[i]);
 			if (carry != 0) {
 				sum += carry;
 			}
 			carry = 0;
-			int temp = value[y] - CHAR_TO_INT + sum;
+			int temp = my_atoi(value[y]) + sum;
 			int val = temp % BASE;
-			value[y] = val + CHAR_TO_INT;
+			value[y] = my_itoa(val);
 			carry = sum / BASE;
 		}
 		row += 1;
 	}
 	if (carry != 0) {
 		extend_value();
-		value[0] = carry + CHAR_TO_INT;
+		value[0] = my_itoa(carry);
 	}
 }
 
@@ -451,25 +438,10 @@ void BigNum::carry_subtraction(const BigNum& minuend, const BigNum& subtrahend){
 	}
 }
 
-//void BigNum::carry_subtraction(const BigNum& minuend, const BigNum& subtrahend) {
-//	int carry = 0;
-//	int subtrahend_position = subtrahend.size;
-//	int subtrahend_offset = 0;
-//	for (int i = minuend.size - 1; i >= 0; i--) {
-//		int minuend_val = minuend.value[i] - CHAR_TO_INT;
-//		int subtrahend_val = i < subtrahend.size ? subtrahend.value[i] - CHAR_TO_INT : 0;
-//		int diff = minuend_val - subtrahend_val - carry;
-//		if (diff < 0) {
-//			diff += BASE;
-//			carry = 1;
-//		}
-//		else {
-//			carry = 0;
-//		}
-//		value[i] = diff + CHAR_TO_INT;
-//		subtrahend_offset++;
-//	}
-//}
+char * BigNum::get_value() {
+	char * val = new char[size + 1];
+	strcpy(val, value);
+}
 
 //BigNum BigNum::operator!() {
 //	/*BigNum *temp(this);

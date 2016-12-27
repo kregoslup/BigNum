@@ -2,12 +2,13 @@
 #include <iostream>
 
 class BigNum {
-private:
-	const int BASE = 10;
-	const char CHAR_TO_INT = '0';
+	friend class BigComplex;
+	static const int BASE = 10;
+	static const char CHAR_TO_INT = '0';
 	const int NEGATIVE = -1;
 	const int POSITIVE = 1;
 	const int SIGN_SIZE = 1;
+	static const char MINUS_CHAR = '-';
 	char *value;
 	int size;
 	int sign;
@@ -26,8 +27,9 @@ private:
 	void carry_multiplication(const BigNum&, const BigNum&);
 	void carry_subtraction(const BigNum&, const BigNum&);
 	bool is_subtract(const BigNum&);
-	void equals_operation(const BigNum&);
 	BigNum addition(const BigNum&);
+	int BigNum::my_atoi(char);
+	int BigNum::my_itoa(int);
 public:
 	BigNum(int=0);
 	BigNum(char *value);
@@ -51,6 +53,7 @@ public:
 	BigNum operator -= (const BigNum&);
 	BigNum operator /= (const BigNum&);
 	BigNum operator *= (const BigNum&);
+	char * get_value();
 	bool operator == (const BigNum&);
 	bool operator == (char*);
 	bool operator != (const BigNum&);
