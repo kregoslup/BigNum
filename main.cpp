@@ -1,16 +1,9 @@
-// projekt_cpp1.cpp : Defines the entry point for the console application.
-//
-#define _DEBUG 
-#define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
 #include "BigNum.h"
 #include <iostream>
 
 
 int main()
 {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	BigNum l1;
 	BigNum l2(9999);
 	BigNum l3("999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999");
@@ -24,7 +17,7 @@ int main()
 	std::cout << l1 << l2 << l3 << l4 << l5 << l6 << *l7;
 
 	delete l7;
-
+	l1 = l1 + l2 - l3 * l4 / l5;
 	l1 = l2;
 	std::cout << l1;
 
