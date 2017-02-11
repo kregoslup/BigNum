@@ -126,13 +126,6 @@ BigComplex BigComplex::operator = (const BigComplex& complex) {
 	return *this;
 }
 
-bool BigComplex::operator== (char* real_val) {
-	if (*real != real_val && *imagine != 0) {
-		return false;
-	}
-	return true;
-}
-
 bool BigComplex::operator== (const BigComplex& complex) {
 	if (*real != *(complex.real) && *imagine != *(complex.imagine)) {
 		return false;
@@ -145,28 +138,6 @@ BigComplex BigComplex::operator + (const BigComplex& complex) {
 	*(result.real) = *real + *(complex.real);
 	*(result.imagine) = *imagine + *(complex.imagine);
 	return result;
-}
-
-BigComplex BigComplex::operator = (char* real_val) {
-	if (*real != real_val && *imagine != 0) {
-		delete imagine;
-		delete real;
-		real = new BigNum(real_val);
-		imagine = new BigNum(0);
-	}
-	return *this;
-}
-
-BigComplex BigComplex::operator = (int real_val) {
-	char temp[8 * sizeof(int)];
-	char * tmp_p = temp;
-	tmp_p = _itoa(real_val, temp, BigNum::BASE);
-	return this->operator=(tmp_p);
-}
-
-BigComplex BigComplex::operator + (int real_val) {
-	BigComplex real_big_complex(real_val);
-	return *this + real_big_complex;
 }
 
 BigComplex BigComplex::operator - (const BigComplex& complex) {
