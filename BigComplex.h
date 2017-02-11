@@ -32,10 +32,7 @@ public:
 	friend std::ostream& operator<<(std::ostream&, const BigComplex&);
 	friend std::istream& operator>> (std::istream&, BigComplex);
 	BigComplex operator = (const BigComplex&);
-	BigComplex operator = (char*);
-	BigComplex operator = (int);
 	BigComplex operator + (const BigComplex&);
-	BigComplex operator + (int);
 	BigComplex operator - (const BigComplex&);
 	BigComplex operator - (void);
 	BigComplex operator * (const BigComplex&);
@@ -46,7 +43,6 @@ public:
 	BigComplex operator *= (const BigComplex&);
 	char * get_value();
 	bool operator == (const BigComplex&);
-	bool operator == (char*);
 	bool operator != (const BigComplex&);
 	bool operator >= (const BigComplex&);
 	bool operator > (const BigComplex&);
